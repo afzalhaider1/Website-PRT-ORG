@@ -1,6 +1,10 @@
 pipeline {
     agent { label 'k8s' }
 
+    environment {
+        IMAGE = "afzalhaider1/prt-app:latest"
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
@@ -10,11 +14,18 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'sudo docker build -t .'
+                sh 'sudo docker build -t $IMAGE .'
             }
         }
 
-        // Removed Push to DockerHub stage
+        stage('Push to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'sudo docker push $IMAGE'
+                }
+            }
+        }
 
         stage('Deploy to Kubernetes') {
             steps {
