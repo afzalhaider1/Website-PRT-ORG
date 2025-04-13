@@ -2,7 +2,7 @@ pipeline {
     agent { label 'k8s' }
 
     environment {
-        IMAGE = "afzalhaider1/prt-app:latest"
+        IMAGE = "prt-app:latest"
     }
 
     stages {
@@ -15,6 +15,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'sudo docker build -t $IMAGE .'
+                sh 'sudo docker tag $IMAGE afzalhaider1/prt-app:latest'
             }
         }
 
@@ -22,7 +23,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'sudo docker push $IMAGE'
+                    sh 'sudo docker push afzalhaider1/prt-app:latest'
                 }
             }
         }
