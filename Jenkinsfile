@@ -1,10 +1,6 @@
 pipeline {
     agent { label 'k8s' }
 
-    environment {
-        IMAGE = "afzalhaider1/prt-app:latest"
-    }
-
     stages {
         stage('Clone Repo') {
             steps {
@@ -14,7 +10,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'sudo docker build -t $IMAGE .'
+                sh 'sudo docker build -t .'
             }
         }
 
